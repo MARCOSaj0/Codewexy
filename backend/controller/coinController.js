@@ -1,5 +1,4 @@
 const Coin = require('../models/Coin');
-const Count = require('../models/Count');
 
 const addCoin = async (req, res) => {
     try {
@@ -9,17 +8,27 @@ const addCoin = async (req, res) => {
         const d_1 = d_a[0];
         const d_2 = d_a[1].split('.')[0];
         const date = `${d_1} ${d_2}`;
-        const coin = new Coin({name, price, date});
-        await coin.save();
-        const set_count = await Count.aggregate([
+        const count_arr = await Coin.aggregate([
             {
                 $match: {
-                    date: d_1
-                },
-                
+                    date: {
+                        $regex: d_1
+                    }
+                }
+            },
+            {
+                $count: 'total'
             }
-        ])
-        res.json("Coin added");
+        ]);
+        const count = count_arr[0]?.total || 0;
+        if (count < 50) {
+            const coin = new Coin({ name, price: parseInt(price), date });
+            await coin.save();
+            res.json("Coin added");
+        }
+        else {
+            res.json("Today's limit of adding 50 coins has been exhausted");
+        }
     } catch (err) {
         console.log(err);
         res.json({ success: false, data: null, message: "Coin adding failed" });
@@ -28,7 +37,7 @@ const addCoin = async (req, res) => {
 
 const getList = async (req, res) => {
     try {
-        const details = await Coin.aggregate([
+        const data = await Coin.aggregate([
             {
                 "$project": {
                     _id: 0,
@@ -38,7 +47,7 @@ const getList = async (req, res) => {
                 }
             }
         ]);
-        res.json({ details });
+        res.json(data);
     } catch (err) {
         console.log(err);
         res.json({ success: false, data: null, message: "Error in Getting coin list" });
