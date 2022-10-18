@@ -22,7 +22,7 @@ const addCoin = async (req, res) => {
         ]);
         const count = count_arr[0]?.total || 0;
         if (count < 50) {
-            const coin = new Coin({ name, price: parseInt(price), date });
+            const coin = new Coin({ name, price: Number(price), date });
             await coin.save();
             res.json("Coin added");
         }
