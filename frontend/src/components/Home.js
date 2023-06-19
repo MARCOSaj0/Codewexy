@@ -7,11 +7,11 @@ const Home = () => {
     const [list, setList] = useState([]);
 
     useEffect(() => {
-        getData();
+        // getData();
     }, [list]);
 
     const getData = async () => {
-        const data = await axios.get('http://localhost:5000/api/getList');
+        const data = await axios.get('http://localhost:8000/api/getList');
         setList(data.data);
     }
 
@@ -24,13 +24,14 @@ const Home = () => {
     const onSubmit = async (event) => {
         event.preventDefault();
         if (coin.name && coin.price) {
-            const data = await axios.post('http://localhost:5000/api/addCoin', coin);
+            const data = await axios.post('http://localhost:8000/api/addCoin', coin);
             alert(data.data);
         }
         else {
             alert("Both fields are required");
         }
         setCoin('');
+        getData();
     };
 
     return (
