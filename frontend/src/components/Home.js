@@ -5,10 +5,11 @@ import './Home.css';
 const Home = () => {
     const [coin, setCoin] = useState('');
     const [list, setList] = useState([]);
+    const [reload, setReload] = useState(false);
 
     useEffect(() => {
-        // getData();
-    }, [list]);
+        getData();
+    }, [reload]);
 
     const getData = async () => {
         const data = await axios.get('http://localhost:8000/api/getList');
@@ -32,6 +33,7 @@ const Home = () => {
         }
         setCoin('');
         getData();
+        setReload(true);
     };
 
     return (
